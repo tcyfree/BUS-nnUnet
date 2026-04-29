@@ -1,0 +1,6 @@
+datasets/
+nnUNet_raw_data/
+nnUNet_preprocessed/
+nnUNet_trained_models/
+nnUNet_results/
+nnUNet_raw/
