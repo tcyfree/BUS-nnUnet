@@ -4,3 +4,4 @@ nnUNet_preprocessed/
 nnUNet_trained_models/
 nnUNet_results/
 nnUNet_raw/
+check_pairs/
