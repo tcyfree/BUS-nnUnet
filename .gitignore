@@ -5,3 +5,8 @@ nnUNet_trained_models/
 nnUNet_results/
 nnUNet_raw/
 check_pairs/
+nnUNet_predict_input/
+prediction_overlays/
+masks_by_patient_id/
+nnUNet_predict_output/
+predict_results/
