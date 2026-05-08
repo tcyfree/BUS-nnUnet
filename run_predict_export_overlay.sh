@@ -17,25 +17,35 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 # =========================
 # 1. 参数设置
 # =========================
-DATASET_ID=1
+DATASET_ID=3
 CONFIG=2d
 FOLD=0
 CHECKPOINT="checkpoint_best.pth"
 
 # 输入：prepare_predict_from_excel.py 已经生成的 nnU-Net 输入目录
-INPUT_DIR="nnUNet_predict_input/3_M"
+# INPUT_DIR="nnUNet_predict_input/3_M"
+# INPUT_DIR="nnUNet_predict_input/3_B"
+INPUT_DIR="nnUNet_predict_input/4_M"
 
 # nnU-Net 原始预测输出目录
-PRED_DIR="nnUNet_predict_output/3_M"
+# PRED_DIR="nnUNet_predict_output/3_M"
+# PRED_DIR="nnUNet_predict_output/3_B"
+PRED_DIR="nnUNet_predict_output/4_M"
 
 # 映射表：prepare_predict_from_excel.py 生成的 mapping csv
-MAPPING_CSV="nnUNet_predict_input/3_M/3_M_predict_mapping.csv"
+# MAPPING_CSV="nnUNet_predict_input/3_M/3_M_predict_mapping.csv"
+# MAPPING_CSV="nnUNet_predict_input/3_B/3_B_predict_mapping.csv"
+MAPPING_CSV="nnUNet_predict_input/4_M/4_M_predict_mapping.csv"
 
 # 按 patient_id 导出的 mask
-MASK_BY_PATIENT_DIR="masks_by_patient_id/3_M"
+# MASK_BY_PATIENT_DIR="masks_by_patient_id/3_M"
+# MASK_BY_PATIENT_DIR="masks_by_patient_id/3_B"
+MASK_BY_PATIENT_DIR="masks_by_patient_id/4_M"
 
 # overlay 可视化输出目录
-OVERLAY_DIR="prediction_overlays/3_M"
+# OVERLAY_DIR="prediction_overlays/3_M"
+# OVERLAY_DIR="prediction_overlays/3_B"
+OVERLAY_DIR="prediction_overlays/4_M"
 
 mkdir -p "${PRED_DIR}"
 mkdir -p "${MASK_BY_PATIENT_DIR}"
@@ -58,7 +68,7 @@ nnUNetv2_predict \
 
 echo ""
 echo "=========================================="
-echo "Step 2/3: Exporting masks by patient_id"
+echo "Step 2/3: Exporting masks by patient_id and image name"
 echo "=========================================="
 
 python - << 'PYCODE'
@@ -67,10 +77,20 @@ import shutil
 import pandas as pd
 
 
-mapping_csv = Path("nnUNet_predict_input/3_M/3_M_predict_mapping.csv")
-pred_dir = Path("nnUNet_predict_output/3_M")
-out_dir = Path("masks_by_patient_id/3_M")
-out_csv = Path("prediction_results_with_patient_id_3_M.csv")
+# mapping_csv = Path("nnUNet_predict_input/3_M/3_M_predict_mapping.csv")
+# pred_dir = Path("nnUNet_predict_output/3_M")
+# out_dir = Path("masks_by_patient_id/3_M")
+# out_csv = Path("prediction_results_with_patient_id_3_M.csv")
+
+# mapping_csv = Path("nnUNet_predict_input/3_B/3_B_predict_mapping.csv")
+# pred_dir = Path("nnUNet_predict_output/3_B")
+# out_dir = Path("masks_by_patient_id/3_B")
+# out_csv = Path("prediction_results_with_patient_id_3_B.csv")
+
+mapping_csv = Path("nnUNet_predict_input/4_M/4_M_predict_mapping.csv")
+pred_dir = Path("nnUNet_predict_output/4_M")
+out_dir = Path("masks_by_patient_id/4_M")
+out_csv = Path("prediction_results_with_patient_id_4_M.csv")
 
 out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -80,6 +100,9 @@ def safe_filename(name):
     name = name.replace("/", "_")
     name = name.replace("\\", "_")
     name = name.replace(" ", "_")
+    name = name.replace("(", "_")
+    name = name.replace(")", "_")
+    name = name.replace(":", "_")
     return name
 
 
@@ -93,6 +116,7 @@ records = []
 for _, row in df.iterrows():
     case_id = str(row["case_id"])
     patient_id = str(row["patient_id"])
+    image_path = Path(row["original_b_mode_image"])
 
     pred_mask = pred_dir / f"{case_id}.png"
 
@@ -100,7 +124,9 @@ for _, row in df.iterrows():
         print(f"[Warning] Missing prediction: {pred_mask}")
         continue
 
-    new_name = f"{safe_filename(patient_id)}_mask.png"
+    image_stem = image_path.stem  # FILE4 / FILE2
+
+    new_name = f"{safe_filename(case_id)}_{safe_filename(patient_id)}_{safe_filename(image_stem)}_mask.png"
     dst_path = out_dir / new_name
 
     shutil.copy(pred_mask, dst_path)
@@ -108,9 +134,10 @@ for _, row in df.iterrows():
     records.append({
         "case_id": case_id,
         "patient_id": patient_id,
-        "original_b_mode_image": row["original_b_mode_image"],
+        "original_b_mode_image": str(image_path),
         "nnunet_mask": str(pred_mask),
         "mask_by_patient_id": str(dst_path),
+        "image_stem": image_stem,
     })
 
 pd.DataFrame(records).to_csv(out_csv, index=False, encoding="utf-8-sig")
@@ -141,8 +168,16 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 
-result_csv = Path("prediction_results_with_patient_id_3_M.csv")
-out_dir = Path("prediction_overlays/3_M")
+# result_csv = Path("prediction_results_with_patient_id_3_M.csv")
+# out_dir = Path("prediction_overlays/3_M")
+# out_dir.mkdir(parents=True, exist_ok=True)
+
+# result_csv = Path("prediction_results_with_patient_id_3_B.csv")
+# out_dir = Path("prediction_overlays/3_B")
+# out_dir.mkdir(parents=True, exist_ok=True)
+
+result_csv = Path("prediction_results_with_patient_id_4_M.csv")
+out_dir = Path("prediction_overlays/4_M")
 out_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -181,6 +216,9 @@ def safe_filename(name):
     name = name.replace("/", "_")
     name = name.replace("\\", "_")
     name = name.replace(" ", "_")
+    name = name.replace("(", "_")
+    name = name.replace(")", "_")
+    name = name.replace(":", "_")
     return name
 
 
@@ -192,9 +230,12 @@ df = pd.read_csv(result_csv)
 saved = 0
 
 for _, row in df.iterrows():
+    case_id = str(row["case_id"])
     patient_id = str(row["patient_id"])
     image_path = Path(row["original_b_mode_image"])
     mask_path = Path(row["mask_by_patient_id"])
+
+    image_stem = image_path.stem
 
     if not image_path.exists():
         print(f"[Warning] image not found: {image_path}")
@@ -209,7 +250,11 @@ for _, row in df.iterrows():
     mask = (mask > 0).astype(np.uint8)
 
     if image.shape != mask.shape:
-        print(f"[Warning] shape mismatch: {patient_id}, image={image.shape}, mask={mask.shape}")
+        print(
+            f"[Warning] shape mismatch: "
+            f"case_id={case_id}, patient_id={patient_id}, "
+            f"image={image.shape}, mask={mask.shape}"
+        )
         continue
 
     overlay = make_overlay(image, mask)
@@ -228,9 +273,16 @@ for _, row in df.iterrows():
     axes[2].set_title("Overlay")
     axes[2].axis("off")
 
-    fig.suptitle(patient_id)
+    fig.suptitle(f"{case_id} | {patient_id} | {image_stem}")
 
-    save_path = out_dir / f"{safe_filename(patient_id)}_overlay.png"
+    save_name = (
+        f"{safe_filename(case_id)}_"
+        f"{safe_filename(patient_id)}_"
+        f"{safe_filename(image_stem)}_overlay.png"
+    )
+
+    save_path = out_dir / save_name
+
     plt.tight_layout()
     plt.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close()
@@ -248,5 +300,5 @@ echo "All done."
 echo "Prediction masks: ${PRED_DIR}"
 echo "Masks by patient_id: ${MASK_BY_PATIENT_DIR}"
 echo "Overlays: ${OVERLAY_DIR}"
-echo "CSV: prediction_results_with_patient_id_3_M.csv"
+echo "CSV: prediction_results_with_patient_id_4_M.csv"
 echo "=========================================="
