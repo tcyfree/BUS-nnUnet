@@ -17,7 +17,9 @@ def main():
     # =========================
     # 1. 修改这里：你的 Excel 路径
     # =========================
-    excel_path = Path("./datasets/3_Malignant_all.xlsx")
+    # excel_path = Path("./datasets/3_Malignant_all.xlsx")
+    # excel_path = Path("./datasets/3_Benign_all.xlsx")
+    excel_path = Path("./datasets/4_Malignant_all.xlsx")
 
     # 如果 Excel 和图像路径是相对路径，例如 ./datasets/...
     # 这里设置为项目根目录
@@ -26,10 +28,14 @@ def main():
     # =========================
     # 2. 输出目录
     # =========================
-    output_dir = Path("nnUNet_predict_input/3_M")
+    # output_dir = Path("nnUNet_predict_input/3_M")
+    # output_dir = Path("nnUNet_predict_input/3_B")
+    output_dir = Path("nnUNet_predict_input/4_M")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    mapping_csv = Path("nnUNet_predict_input/3_M/3_M_predict_mapping.csv")
+    # mapping_csv = Path("nnUNet_predict_input/3_M/3_M_predict_mapping.csv")
+    # mapping_csv = Path("nnUNet_predict_input/3_B/3_B_predict_mapping.csv")
+    mapping_csv = Path("nnUNet_predict_input/4_M/4_M_predict_mapping.csv")
 
     # =========================
     # 3. 读取 Excel

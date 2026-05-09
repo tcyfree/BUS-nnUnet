@@ -40,11 +40,15 @@ def check_pair_size(img_path, mask_path):
 
 
 def main():
-    src_root = Path("datasets/BUSI")
+    # src_root = Path("datasets/BUSI")
+    # src_root = Path("datasets/BUSI_3M")
+    src_root = Path("datasets/BUSI_sw_all")
     img_dir = src_root / "img"
     label_dir = src_root / "label"
 
-    out_root = Path("nnUNet_raw/Dataset001_BUSI")
+    # out_root = Path("nnUNet_raw/Dataset001_BUSI")
+    # out_root = Path("nnUNet_raw/Dataset002_BUSI_3M")
+    out_root = Path("nnUNet_raw/Dataset003_BUSI_sw_all")
     imagesTr = out_root / "imagesTr"
     labelsTr = out_root / "labelsTr"
 

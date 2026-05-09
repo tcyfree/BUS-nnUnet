@@ -10,3 +10,4 @@ prediction_overlays/
 masks_by_patient_id/
 nnUNet_predict_output/
 predict_results/
+labelme_annotations/
