@@ -5,9 +5,17 @@ import numpy as np
 import cv2
 
 # ================= 配置区域 =================
-INPUT_ROOT = "/home/network/Desktop/Project/BreastUS-GPT/segment/3M"       # 原始数据根目录
-OUTPUT_IMG_DIR = "datasets/sw/3M/img"       # 原图输出目录
-OUTPUT_LABEL_DIR = "datasets/sw/3M/label"   # Mask输出目录
+# INPUT_ROOT = "/home/network/Desktop/Project/BreastUS-GPT/segment/3M"       # 原始数据根目录
+# OUTPUT_IMG_DIR = "datasets/sw/3M/img"       # 原图输出目录
+# OUTPUT_LABEL_DIR = "datasets/sw/3M/label"   # Mask输出目录
+
+# INPUT_ROOT = "/home/network/Desktop/Project/BreastUS-GPT/segment/BR4a"       # 原始数据根目录
+# OUTPUT_IMG_DIR = "datasets/sw/4M/img"       # 原图输出目录
+# OUTPUT_LABEL_DIR = "datasets/sw/4M/label"   # Mask输出目录
+
+INPUT_ROOT = "/home/network/Desktop/Project/BreastUS-GPT/segment/3B"       # 原始数据根目录
+OUTPUT_IMG_DIR = "datasets/sw/3B/img"       # 原图输出目录
+OUTPUT_LABEL_DIR = "datasets/sw/3B/label"   # Mask输出目录
 
 # 标签映射：修改为颜色元组 (B, G, R) - 因为 OpenCV 默认是 BGR 通道顺序
 # 例如："lesion" 标记为纯红色 (0, 0, 255)
